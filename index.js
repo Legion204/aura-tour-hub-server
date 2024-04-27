@@ -25,7 +25,13 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    const touristSpotCollection = client.db("tourSpotDB").collection("touristSpots")
+    const touristSpotCollection = client.db("tourSpotDB").collection("touristSpots");
+
+    app.get("/tourist_spots", async (req,res)=>{
+      const curser= touristSpotCollection.find()
+      const result = await curser.toArray()
+      res.send(result);
+    })
 
     app.post("/tourist_spots", async (req, res) => {
       const touristSpot = req.body

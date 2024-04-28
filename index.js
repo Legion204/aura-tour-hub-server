@@ -46,6 +46,14 @@ async function run() {
       const result = await touristSpotCollection.findOne(query)
       res.send(result);
     })
+    // for my list
+    app.get("/my_list/:email", async (req,res)=>{
+      const email = req.params.email
+      const query={userEmail: email}
+      const curser = touristSpotCollection.find(query)
+      const result= await curser.toArray()
+      res.send(result);
+    })
 
 
     // Send a ping to confirm a successful connection

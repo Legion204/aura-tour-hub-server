@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@cluster0.tba2ihq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -26,7 +26,7 @@ async function run() {
     // await client.connect();
 
     const touristSpotCollection = client.db("tourSpotDB").collection("touristSpots");
-
+    // for all tourist spots
     app.get("/tourist_spots", async (req,res)=>{
       const curser= touristSpotCollection.find()
       const result = await curser.toArray()
@@ -36,6 +36,14 @@ async function run() {
     app.post("/tourist_spots", async (req, res) => {
       const touristSpot = req.body
       const result=await touristSpotCollection.insertOne(touristSpot);
+      res.send(result);
+    })
+
+    // for tourist spot details
+    app.get("/tourist_spots/:id", async (req,res)=>{
+      const id = req.params.id
+      const query={_id: new ObjectId(id)}
+      const result = await touristSpotCollection.findOne(query)
       res.send(result);
     })
 

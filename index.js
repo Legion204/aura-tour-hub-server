@@ -27,32 +27,66 @@ async function run() {
 
     const touristSpotCollection = client.db("tourSpotDB").collection("touristSpots");
     // for all tourist spots
-    app.get("/tourist_spots", async (req,res)=>{
-      const curser= touristSpotCollection.find()
+    app.get("/tourist_spots", async (req, res) => {
+      const curser = touristSpotCollection.find()
       const result = await curser.toArray()
       res.send(result);
     })
 
     app.post("/tourist_spots", async (req, res) => {
       const touristSpot = req.body
-      const result=await touristSpotCollection.insertOne(touristSpot);
+      const result = await touristSpotCollection.insertOne(touristSpot);
       res.send(result);
     })
 
     // for tourist spot details
-    app.get("/tourist_spots/:id", async (req,res)=>{
+    app.get("/tourist_spots/:id", async (req, res) => {
       const id = req.params.id
-      const query={_id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const result = await touristSpotCollection.findOne(query)
       res.send(result);
     })
-    // for my list
-    app.get("/my_list/:email", async (req,res)=>{
-      const email = req.params.email
-      const query={userEmail: email}
-      const curser = touristSpotCollection.find(query)
-      const result= await curser.toArray()
+
+    // for update tourist spot data
+    app.put("/tourist_spots/:id", async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const options = { upsert: true };
+      const updatedTouristSpotData = req.body
+      const doc = {
+        $set: {
+          touristSpotName: updatedTouristSpotData.touristSpotName,
+          countryName: updatedTouristSpotData.countryName,
+          location: updatedTouristSpotData.location,
+          averageCost: updatedTouristSpotData.averageCost,
+          seasonality: updatedTouristSpotData.seasonality,
+          travelTime: updatedTouristSpotData.travelTime,
+          shortDescription: updatedTouristSpotData.shortDescription,
+          totalVisitorPerYear: updatedTouristSpotData.totalVisitorPerYear,
+          imageUrl: updatedTouristSpotData.imageUrl
+        }
+      }
+
+      const result=await touristSpotCollection.updateOne(query,doc,options);
       res.send(result);
+
+    })
+
+    // for my list
+    app.get("/my_list/:email", async (req, res) => {
+      const email = req.params.email
+      const query = { userEmail: email }
+      const curser = touristSpotCollection.find(query)
+      const result = await curser.toArray()
+      res.send(result);
+    })
+
+    // delete a tourist spot
+    app.delete("/tourist_spots/:id", async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await touristSpotCollection.deleteOne(query)
+      res.send(result)
     })
 
 

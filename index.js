@@ -26,6 +26,7 @@ async function run() {
     // await client.connect();
 
     const touristSpotCollection = client.db("tourSpotDB").collection("touristSpots");
+    const countryCollection = client.db("countryDB").collection("countries");
     // for all tourist spots
     app.get("/tourist_spots", async (req, res) => {
       const curser = touristSpotCollection.find()
@@ -33,6 +34,33 @@ async function run() {
       res.send(result);
     })
 
+    // for all country data
+    app.get("/countries",async (req,res)=>{
+      const curser= countryCollection.find()
+      const result= await curser.toArray()
+      res.send(result);
+    })
+
+    // for single country data
+    app.get("/countries/:id",async (req,res)=>{
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await countryCollection.findOne(query)
+      res.send(result);
+    })
+
+    // for specific country tourist spots
+    app.get("/country_tourist_spot/:countryName", async (req,res)=>{
+      const country = req.params.countryName
+      const filter ={countryName:country}
+      const curser = touristSpotCollection.find(filter);
+      const result = await curser.toArray()
+      res.send(result);
+
+    })
+
+
+    // create data
     app.post("/tourist_spots", async (req, res) => {
       const touristSpot = req.body
       const result = await touristSpotCollection.insertOne(touristSpot);
